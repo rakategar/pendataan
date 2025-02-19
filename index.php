@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="style.css"  />
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koneksi HTML ke SQL</title>
@@ -17,7 +17,7 @@
         <form action="connect.php" method="post" style="display: flex; flex-direction: column; gap: 6px;">
             <input type="text" id="Nama" name="Nama" required placeholder="Masukkan Nama">
             <input type="text" id="Kelas" name="Kelas" required placeholder="Masukkan Kelas">
-            <input type="text" id="NIM" name="NIM" required  placeholder="Masukkan NIM" minlength="11" maxlength="11">
+            <input type="text" id="NIM" name="NIM" required placeholder="Masukkan NIM" minlength="11" maxlength="11">
             <input type="submit" value="submit">
         </form>
     </div>
@@ -42,12 +42,12 @@
             $ambildata = $conn->query("SELECT * FROM siswa");
             while ($tampil = $ambildata->fetch_assoc()) {
                 echo "
-                <tr onclick='fillForm(" . json_encode($tampil) . ")'>
+                <tr>
                     <td>" . $tampil['Nama'] . "</td>
                     <td>" . $tampil['Kelas'] . "</td>
                     <td>" . $tampil['NIM'] . "</td>
                     <td>
-                    <button class=button-3>Delete</button>
+                        <button class='button-3' onclick='deleteData(\"" . $tampil['NIM'] . "\")'>Delete</button>
                     </td>
                 </tr>
                 ";
@@ -59,11 +59,27 @@
     </div>
 
     <script>
-        // Fungsi untuk mengisi form dengan data dari baris tabel
-        function fillForm(data) {
-            document.getElementById("Nama").value = data.Nama;
-            document.getElementById("Kelas").value = data.Kelas;
-            document.getElementById("NIM").value = data.NIM; // NIM sebagai primary key, tidak bisa diubah
+        // Fungsi untuk menghapus data berdasarkan NIM
+        function deleteData(nim) {
+            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+                fetch("delete.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `NIM=${nim}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data === "success") {
+                        alert("Data berhasil dihapus!");
+                        location.reload(); // Refresh halaman untuk memperbarui tabel
+                    } else {
+                        alert("Terjadi kesalahan: " + data);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
         }
     </script>
 </body>
